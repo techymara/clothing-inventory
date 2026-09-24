@@ -1,0 +1,1624 @@
+<title>Clothing Inventory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --surface-alt: #f1efea;
+    --border: #e3dfd6;
+    --text: #201f1b;
+    --text-muted: #6b675e;
+    --accent: #3b5d50;
+    --accent-ink: #ffffff;
+    --accent-soft: #e4ece8;
+    --gold: #9c7a41;
+    --gold-soft: #f3ecdd;
+    --new-badge: #b3541e;
+    --new-badge-soft: #f6e6da;
+    --danger: #a3352b;
+    --danger-soft: #f7e3e0;
+    --overlay: rgba(32, 31, 27, 0.45);
+
+    --cat-clothing: #3b5d50;
+    --cat-shoes: #9c5b3e;
+    --cat-accessories: #a3833f;
+    --cat-handbags: #6b4e71;
+    --cat-intimates: #b0637a;
+    --cat-other: #6b675e;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171815;
+      --surface: #202220;
+      --surface-alt: #282a26;
+      --border: #3a3c35;
+      --text: #ede9e0;
+      --text-muted: #a6a296;
+      --accent: #86ab98;
+      --accent-ink: #13201a;
+      --accent-soft: #263129;
+      --gold: #d3b077;
+      --gold-soft: #332b1d;
+      --new-badge: #e08a54;
+      --new-badge-soft: #3a2a1f;
+      --danger: #e5877c;
+      --danger-soft: #3a211e;
+      --overlay: rgba(0, 0, 0, 0.6);
+
+      --cat-clothing: #86ab98;
+      --cat-shoes: #c98a63;
+      --cat-accessories: #d3af7c;
+      --cat-handbags: #b092b6;
+      --cat-intimates: #dd93a8;
+      --cat-other: #a6a296;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #171815;
+    --surface: #202220;
+    --surface-alt: #282a26;
+    --border: #3a3c35;
+    --text: #ede9e0;
+    --text-muted: #a6a296;
+    --accent: #86ab98;
+    --accent-ink: #13201a;
+    --accent-soft: #263129;
+    --gold: #d3b077;
+    --gold-soft: #332b1d;
+    --new-badge: #e08a54;
+    --new-badge-soft: #3a2a1f;
+    --danger: #e5877c;
+    --danger-soft: #3a211e;
+    --overlay: rgba(0, 0, 0, 0.6);
+
+    --cat-clothing: #86ab98;
+    --cat-shoes: #c98a63;
+    --cat-accessories: #d3af7c;
+    --cat-handbags: #b092b6;
+    --cat-intimates: #dd93a8;
+    --cat-other: #a6a296;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    padding-inline: 20px;
+    padding-block: 0 96px;
+  }
+
+  a { color: var(--accent); }
+
+  h1, h2, h3, .display {
+    font-family: "Fraunces", Georgia, serif;
+    text-wrap: balance;
+  }
+
+  button, input, select, textarea { font: inherit; color: inherit; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- header ---------- */
+  header.top {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--bg);
+    padding-block: 18px 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .top-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .meta {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tab {
+    border: none;
+    background: none;
+    padding: 8px 12px 10px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+
+  .tab .n {
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+  }
+
+  .tab .n.alert {
+    background: var(--new-badge);
+    color: var(--surface);
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-weight: 600;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search {
+    flex: 1 1 220px;
+    max-width: 420px;
+    font-size: 14px;
+    padding: 9px 13px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .search:focus { outline: none; border-color: var(--accent); }
+  .search::placeholder { color: var(--text-muted); }
+
+  .btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 9px;
+    padding: 8px 14px;
+    font-weight: 500;
+    font-size: 13.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn.danger { color: var(--danger); border-color: var(--danger-soft); background: var(--danger-soft); }
+  .btn.ghost { border-color: transparent; background: none; }
+  .btn.small { padding: 5px 10px; font-size: 12.5px; }
+  .btn[disabled] { opacity: 0.5; cursor: default; }
+  .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .chip {
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 5px 12px 5px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .chip:hover { border-color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+  .chip .swatch { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .chip .count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .filters select {
+    font-size: 13px;
+    padding: 6px 28px 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    max-width: 100%;
+  }
+
+  .filters select.on { border-color: var(--accent); background: var(--accent-soft); }
+
+  .filters .clear { font-size: 12.5px; }
+
+  /* ---------- grid ---------- */
+  section.group { margin-bottom: 30px; }
+
+  .group-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .group-head .swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .group-head h2 { font-size: 17px; font-weight: 500; margin: 0; }
+  .group-head .n { font-size: 12.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+    gap: 18px 16px;
+  }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+  }
+
+  .tile {
+    border: none;
+    background: none;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    position: relative;
+  }
+
+  .ph {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+  }
+
+  .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .tile:hover .ph { border-color: var(--accent); }
+
+  .ph-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .ph-empty .dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border); }
+
+  .ph-empty .kind {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 17px;
+    color: var(--text-muted);
+    line-height: 1.2;
+  }
+
+  .ph-empty .hint {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+
+  .tile .name {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .tile .sub {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: -4px;
+  }
+
+  .tag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+
+  .tag.new { background: var(--new-badge-soft); color: var(--new-badge); }
+  .tag.listed { background: var(--gold-soft); color: var(--gold); }
+
+  .check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+    background: rgba(0, 0, 0, 0.25);
+    display: grid;
+    place-items: center;
+    color: var(--accent-ink);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .tile.sel .ph { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .tile.sel .check { background: var(--accent); border-color: var(--accent); }
+
+  .empty, .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+
+  /* ---------- review + gone lists ---------- */
+  .intro { color: var(--text-muted); max-width: 62ch; margin: 0 0 18px; line-height: 1.5; }
+
+  .stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .stat {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 12px 16px;
+    min-width: 140px;
+  }
+
+  .stat .v { font-family: "Fraunces", Georgia, serif; font-size: 24px; font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .rows { display: flex; flex-direction: column; gap: 10px; }
+
+  .row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .row .thumb {
+    width: 64px;
+    height: 80px;
+    flex: none;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface-alt);
+  }
+
+  .row .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .row .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .row .title { font-weight: 500; overflow-wrap: anywhere; }
+  .row .line { font-size: 12.5px; color: var(--text-muted); overflow-wrap: anywhere; }
+  .row .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .row.clickable { cursor: pointer; }
+  .row.clickable:hover { border-color: var(--accent); }
+
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    color: var(--text-muted);
+    vertical-align: middle;
+  }
+
+  .pill.sold { background: var(--gold-soft); color: var(--gold); }
+  .pill.newp { background: var(--accent-soft); color: var(--accent); }
+
+  /* ---------- selection bar ---------- */
+  .selbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 8;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .selbar .count { font-weight: 500; margin-right: auto; font-variant-numeric: tabular-nums; }
+
+  /* ---------- dialogs ---------- */
+  dialog {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 16px;
+    padding: 0;
+    width: min(640px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+  }
+
+  dialog::backdrop { background: var(--overlay); }
+
+  .dlg { display: flex; flex-direction: column; gap: 16px; padding: 20px; }
+
+  .dlg-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .dlg-head h2 { margin: 0; font-size: 22px; font-weight: 500; line-height: 1.25; overflow-wrap: anywhere; }
+  .dlg-head .x { font-size: 20px; line-height: 1; padding: 4px 10px; }
+
+  .detail-top { display: grid; grid-template-columns: 220px 1fr; gap: 20px; }
+
+  @media (max-width: 560px) {
+    .detail-top { grid-template-columns: 1fr; }
+    .detail-top .ph { max-width: 280px; }
+  }
+
+  .photo-col { display: flex; flex-direction: column; gap: 8px; }
+
+  dl.facts {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 7px 14px;
+    font-size: 13.5px;
+    align-content: start;
+  }
+
+  dl.facts dt { color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  dl.facts dd { margin: 0; overflow-wrap: anywhere; }
+
+  .note-box {
+    background: var(--surface-alt);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 14px; }
+  .actions .spacer { flex: 1; }
+
+  .inline-form {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--surface-alt);
+  }
+
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fields .wide { grid-column: 1 / -1; }
+
+  @media (max-width: 480px) { .fields { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .field label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .field input, .field select, .field textarea {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+
+  .photo-drop {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .photo-drop .ph { width: 88px; flex: none; }
+  .photo-drop .ctl { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .photo-drop .help { font-size: 12.5px; color: var(--text-muted); }
+
+  .msg { font-size: 13px; color: var(--text-muted); }
+  .msg.err { color: var(--danger); }
+
+  /* ---------- toast ---------- */
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 20;
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    max-width: calc(100vw - 32px);
+  }
+
+  footer.foot {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tile .ph img { transition: transform 0.25s ease; }
+    .tile:hover .ph img { transform: scale(1.03); }
+  }
+</style>
+
+<header class="top">
+  <div class="top-row">
+    <h1>Wardrobe Ledger</h1>
+    <div class="meta" id="metaLine">Loading&hellip;</div>
+  </div>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <div class="toolbar" id="toolbar">
+    <input class="search" id="search" type="text" placeholder="Search by item, brand, or color&hellip;" autocomplete="off">
+    <button class="btn primary" id="addBtn" type="button">+ Add item</button>
+    <button class="btn" id="selectBtn" type="button" aria-pressed="false">Select</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="filters" id="filters"></div>
+</header>
+
+<main id="main">
+  <div class="loading">Loading your closet&hellip;</div>
+</main>
+
+<footer class="foot">
+  Every Sunday, Claude checks your Gmail for new purchases and resale sales and puts them in the Review tab for you to approve.<br>
+  Items you mark as gone are deleted for good one year after they leave.
+</footer>
+
+<div class="selbar" id="selbar" hidden>
+  <span class="count" id="selCount">0 selected</span>
+  <button class="btn" id="selListed" type="button">Mark listed for sale</button>
+  <button class="btn primary" id="selGone" type="button">Mark as gone</button>
+  <button class="btn ghost" id="selCancel" type="button">Cancel</button>
+</div>
+
+<dialog id="detailDlg"></dialog>
+<dialog id="editDlg"></dialog>
+<dialog id="goneDlg"></dialog>
+<input type="file" id="photoPick" accept="image/*" hidden>
+<div id="toast" hidden></div>
+
+<script>
+  var CATEGORY_ORDER = ["Clothing", "Shoes", "Accessories", "Handbags", "Intimates"];
+  var CATEGORY_COLOR = {
+    "Clothing": "var(--cat-clothing)",
+    "Shoes": "var(--cat-shoes)",
+    "Accessories": "var(--cat-accessories)",
+    "Handbags": "var(--cat-handbags)",
+    "Intimates": "var(--cat-intimates)"
+  };
+  var GONE_REASONS = ["Sold", "Donated", "Gave away", "Returned", "Tossed"];
+  var PURGE_DAYS = 365;
+
+  var COLOR_FAMILIES = [
+    { name: "Black", sw: "#1f1f1f", keys: ["black"] },
+    { name: "White & cream", sw: "#f4f1e8", keys: ["white", "cream", "ivory", "off-white"] },
+    { name: "Gray", sw: "#9a9a96", keys: ["gray", "grey", "silver", "pewter", "charcoal"] },
+    { name: "Brown & tan", sw: "#8a6040", keys: ["brown", "tan", "beige", "chestnut", "camel", "neutral", "rattan", "wicker", "khaki", "taupe", "tortoise", "choco", "natural", "camo"] },
+    { name: "Blue", sw: "#3f6fa8", keys: ["blue", "navy", "turquoise", "denim", "teal"] },
+    { name: "Green", sw: "#5b7a4a", keys: ["green", "olive", "sage", "mint"] },
+    { name: "Red", sw: "#a3322b", keys: ["red", "maroon", "burgundy", "garnet", "wine"] },
+    { name: "Pink", sw: "#e39bb0", keys: ["pink", "salmon", "rose", "blush"] },
+    { name: "Orange", sw: "#e07a2e", keys: ["orange", "rust"] },
+    { name: "Yellow & gold", sw: "#e2c044", keys: ["yellow", "gold", "mustard"] },
+    { name: "Purple", sw: "#7a5a9c", keys: ["purple", "lavender", "violet", "lilac", "plum"] },
+    { name: "Multicolor", sw: "linear-gradient(135deg,#e07a2e,#3f6fa8,#5b7a4a)", keys: ["rainbow", "multi", "pattern", "stripe", "plaid", "print", "crystal"] }
+  ];
+
+  var ui = {
+    items: null, pending: [],
+    tab: "closet", search: "", cat: "All",
+    brand: "", occasion: "", color: "", sort: "name",
+    selecting: false, selected: {},
+    detailId: null, detailMode: "view"
+  };
+  var db = null, assets = null, sample = null, canSendImages = false;
+
+  try { var saved = JSON.parse(localStorage.getItem("wl-view") || "{}"); if (saved.sort) ui.sort = saved.sort; } catch (e) {}
+
+  /* ---------- helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function isBlank(v) {
+    if (v == null) return true;
+    var s = String(v).trim();
+    return s === "" || s.toUpperCase() === "N/A";
+  }
+  function val(v) { return isBlank(v) ? "" : String(v).trim(); }
+  function normCat(c) { return (c || "").trim() || "Uncategorized"; }
+  function catColor(cat) { return CATEGORY_COLOR[cat] || "var(--cat-other)"; }
+  function statusOf(it) { return it.status === "gone" || it.status === "listed" ? it.status : "active"; }
+  function priceNum(v) {
+    if (isBlank(v)) return null;
+    var m = String(v).replace(/,/g, "").match(/[0-9]+(\.[0-9]+)?/);
+    return m ? parseFloat(m[0]) : null;
+  }
+  function money(n) { return "$" + Math.round(n).toLocaleString(); }
+  function formatPrice(v) {
+    var n = priceNum(v);
+    return n == null ? "" : money(n);
+  }
+  function isRecent(it) {
+    var t = Date.parse(it.addedAt || "");
+    return !isNaN(t) && Date.now() - t < 14 * 864e5;
+  }
+  function fmtDate(v) {
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  }
+  function todayISO() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function colorFamilies(it) {
+    var s = String(it.colors || "").toLowerCase();
+    return COLOR_FAMILIES.filter(function (f) {
+      return f.keys.some(function (k) { return s.indexOf(k) !== -1; });
+    }).map(function (f) { return f.name; });
+  }
+  function firstFamily(it) {
+    var names = colorFamilies(it);
+    for (var i = 0; i < COLOR_FAMILIES.length; i++) if (COLOR_FAMILIES[i].name === names[0]) return COLOR_FAMILIES[i];
+    return null;
+  }
+  function blobId(url) {
+    var m = String(url || "").match(/\/_blob\/([0-9a-f]{32})/);
+    return m ? m[1] : null;
+  }
+  function brandKey(b) { return val(b).toLowerCase().replace(/\s+/g, ""); }
+  function occasionOk(a) { a = val(a); return a && !/^[0-9]+$/.test(a); }
+  function byId(id) {
+    return (ui.items || []).filter(function (it) { return it.id === id; })[0] || null;
+  }
+  function nextItemId() {
+    var max = 0;
+    (ui.items || []).forEach(function (it) {
+      var m = /^item-(\d+)$/.exec(it.id);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    });
+    return "item-" + String(max + 1).padStart(4, "0");
+  }
+  function stripMeta(it) {
+    var o = {};
+    Object.keys(it).forEach(function (k) { if (k !== "id") o[k] = it[k]; });
+    return o;
+  }
+
+  var toastTimer = null;
+  function toast(text) {
+    var t = $("toast");
+    t.textContent = text;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; }, 3200);
+  }
+
+  function dbError(e) {
+    var code = e && e.code;
+    if (code === "quota_exceeded") return "The closet database is full. Delete some gone items to make room.";
+    if (code === "invalid_argument") return "You don't have permission to change this closet.";
+    return "Couldn't save. Check your connection and try again.";
+  }
+
+  function assetError(e) {
+    var code = e && e.code;
+    if (code === "unsupported_type") return "That file type isn't supported. Use a JPEG, PNG, or WebP photo.";
+    if (code === "too_large") return "That photo is too large. Try a smaller one.";
+    if (code === "quota_or_state") return "Photo storage is full.";
+    if (code === "rate_limited") return "Too many uploads at once. Wait a moment and try again.";
+    return "The photo didn't upload. Try again.";
+  }
+
+  /* Shrinks big phone photos before upload so the closet loads fast. */
+  function shrink(file) {
+    return new Promise(function (resolve) {
+      try {
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var max = 1400, w = img.naturalWidth, h = img.naturalHeight;
+            var s = Math.min(1, max / Math.max(w, h));
+            var c = document.createElement("canvas");
+            c.width = Math.max(1, Math.round(w * s));
+            c.height = Math.max(1, Math.round(h * s));
+            var ctx = c.getContext("2d");
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, c.width, c.height);
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+            c.toBlob(function (b) { resolve(b || file); }, "image/jpeg", 0.86);
+          } catch (e) { resolve(file); }
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); resolve(file); };
+        img.src = url;
+      } catch (e) { resolve(file); }
+    });
+  }
+
+  function uploadPhoto(file) {
+    if (!assets) return Promise.reject({ code: "not_granted" });
+    return shrink(file).then(function (b) { return assets.upload(b); });
+  }
+
+  function photoBox(it, hintText) {
+    var inner;
+    if (!isBlank(it.imageUrl)) {
+      inner = '<img src="' + esc(it.imageUrl) + '" alt="' + esc(it.itemDescription) + '" loading="lazy">';
+    } else {
+      var fam = firstFamily(it);
+      inner = '<div class="ph-empty">' +
+        (fam ? '<span class="dot" style="background:' + fam.sw + '"></span>' : "") +
+        '<span class="kind">' + esc(val(it.item) || normCat(it.category)) + "</span>" +
+        (hintText ? '<span class="hint">' + esc(hintText) + "</span>" : "") + "</div>";
+    }
+    return '<div class="ph">' + inner + "</div>";
+  }
+
+  /* ---------- views ---------- */
+  function lists() {
+    var all = ui.items || [];
+    return {
+      closet: all.filter(function (it) { return statusOf(it) !== "gone"; }),
+      listed: all.filter(function (it) { return statusOf(it) === "listed"; }),
+      gone: all.filter(function (it) { return statusOf(it) === "gone"; })
+    };
+  }
+
+  function render() {
+    if (!ui.items) return;
+    var L = lists();
+    renderMeta(L);
+    renderTabs(L);
+    var gridTab = ui.tab === "closet" || ui.tab === "listed";
+    $("toolbar").hidden = !(gridTab || ui.tab === "gone");
+    $("addBtn").hidden = !gridTab || !db;
+    $("selectBtn").hidden = !gridTab || !db;
+    $("chips").hidden = !gridTab;
+    $("filters").hidden = !gridTab;
+    if (!gridTab && ui.selecting) endSelect();
+    if (gridTab) {
+      var base = ui.tab === "closet" ? L.closet : L.listed;
+      renderChips(base);
+      renderFilters(base);
+      renderGrid(base);
+    } else if (ui.tab === "review") {
+      renderReview();
+    } else {
+      renderGone(L.gone);
+    }
+    renderSelbar();
+    if (ui.detailId && $("detailDlg").open && ui.detailMode === "view") renderDetail();
+  }
+
+  function renderMeta(L) {
+    var total = 0, priced = 0;
+    L.closet.forEach(function (it) { var n = priceNum(it.approxPrice); if (n != null) { total += n; priced++; } });
+    var parts = [L.closet.length + (L.closet.length === 1 ? " item" : " items")];
+    if (priced) parts.push(money(total) + " recorded value");
+    $("metaLine").textContent = parts.join(" · ");
+  }
+
+  function renderTabs(L) {
+    var tabs = [
+      ["closet", "Closet", L.closet.length, false],
+      ["listed", "For sale", L.listed.length, false],
+      ["review", "Review", ui.pending.length, ui.pending.length > 0],
+      ["gone", "Gone", L.gone.length, false]
+    ];
+    $("tabs").innerHTML = tabs.map(function (t) {
+      return '<button class="tab" role="tab" type="button" data-tab="' + t[0] + '" aria-selected="' + (ui.tab === t[0]) + '">' +
+        t[1] + ' <span class="n' + (t[3] ? " alert" : "") + '">' + t[2] + "</span></button>";
+    }).join("");
+  }
+
+  function renderChips(base) {
+    var byCat = {};
+    base.forEach(function (it) { var c = normCat(it.category); byCat[c] = (byCat[c] || 0) + 1; });
+    var cats = CATEGORY_ORDER.concat(Object.keys(byCat).filter(function (c) { return CATEGORY_ORDER.indexOf(c) === -1; }));
+    var html = '<button class="chip" type="button" data-cat="All" aria-pressed="' + (ui.cat === "All") + '">All <span class="count">' + base.length + "</span></button>";
+    cats.forEach(function (cat) {
+      if (!byCat[cat]) return;
+      html += '<button class="chip" type="button" data-cat="' + esc(cat) + '" aria-pressed="' + (ui.cat === cat) + '">' +
+        '<span class="swatch" style="background:' + catColor(cat) + '"></span>' + esc(cat) +
+        ' <span class="count">' + byCat[cat] + "</span></button>";
+    });
+    $("chips").innerHTML = html;
+  }
+
+  function renderFilters(base) {
+    var brands = {}, occ = {}, fams = {};
+    base.forEach(function (it) {
+      var bk = brandKey(it.brand);
+      if (bk && !brands[bk]) brands[bk] = val(it.brand);
+      if (occasionOk(it.attire)) occ[val(it.attire)] = true;
+      colorFamilies(it).forEach(function (f) { fams[f] = true; });
+    });
+    function opts(list, current, allLabel) {
+      return '<option value="">' + allLabel + "</option>" + list.map(function (o) {
+        return '<option value="' + esc(o[0]) + '"' + (o[0] === current ? " selected" : "") + ">" + esc(o[1]) + "</option>";
+      }).join("");
+    }
+    var brandList = Object.keys(brands).map(function (k) { return [k, brands[k]]; })
+      .sort(function (a, b) { return a[1].localeCompare(b[1]); });
+    var occList = Object.keys(occ).sort().map(function (o) { return [o, o]; });
+    var famList = COLOR_FAMILIES.filter(function (f) { return fams[f.name]; }).map(function (f) { return [f.name, f.name]; });
+    var sorts = [["name", "Sort: Name"], ["newest", "Sort: Newest"], ["priceHigh", "Sort: Price, high to low"], ["priceLow", "Sort: Price, low to high"]];
+    var anyOn = ui.brand || ui.occasion || ui.color;
+    $("filters").innerHTML =
+      '<select id="fBrand" aria-label="Brand" class="' + (ui.brand ? "on" : "") + '">' + opts(brandList, ui.brand, "All brands") + "</select>" +
+      '<select id="fOcc" aria-label="Occasion" class="' + (ui.occasion ? "on" : "") + '">' + opts(occList, ui.occasion, "All occasions") + "</select>" +
+      '<select id="fColor" aria-label="Color" class="' + (ui.color ? "on" : "") + '">' + opts(famList, ui.color, "All colors") + "</select>" +
+      '<select id="fSort" aria-label="Sort">' + sorts.map(function (s) {
+        return '<option value="' + s[0] + '"' + (s[0] === ui.sort ? " selected" : "") + ">" + s[1] + "</option>";
+      }).join("") + "</select>" +
+      (anyOn ? '<button class="btn ghost small clear" type="button" id="fClear">Clear filters</button>' : "");
+  }
+
+  function filtered(base) {
+    var q = ui.search.trim().toLowerCase();
+    return base.filter(function (it) {
+      if (ui.cat !== "All" && normCat(it.category) !== ui.cat) return false;
+      if (ui.brand && brandKey(it.brand) !== ui.brand) return false;
+      if (ui.occasion && val(it.attire) !== ui.occasion) return false;
+      if (ui.color && colorFamilies(it).indexOf(ui.color) === -1) return false;
+      if (!q) return true;
+      return [it.itemDescription, it.brand, it.colors, it.item, it.notes, it.notes2, it.size]
+        .map(function (v) { return String(v || "").toLowerCase(); }).join(" ").indexOf(q) !== -1;
+    });
+  }
+
+  function sortItems(rows) {
+    var s = ui.sort;
+    return rows.slice().sort(function (a, b) {
+      if (s === "newest") return (Date.parse(b.addedAt || 0) || 0) - (Date.parse(a.addedAt || 0) || 0) || b.id.localeCompare(a.id);
+      if (s === "priceHigh" || s === "priceLow") {
+        var pa = priceNum(a.approxPrice), pb = priceNum(b.approxPrice);
+        if (pa == null && pb == null) return 0;
+        if (pa == null) return 1;
+        if (pb == null) return -1;
+        return s === "priceHigh" ? pb - pa : pa - pb;
+      }
+      return (a.itemDescription || "").localeCompare(b.itemDescription || "");
+    });
+  }
+
+  function tileHtml(it) {
+    var st = statusOf(it);
+    var tag = st === "listed" ? '<span class="tag listed">Listed</span>' : (isRecent(it) ? '<span class="tag new">New</span>' : "");
+    var sel = !!ui.selected[it.id];
+    var sub = [];
+    if (val(it.brand)) sub.push("<span>" + esc(val(it.brand)) + "</span>");
+    if (val(it.size)) sub.push("<span>Size " + esc(val(it.size)) + "</span>");
+    return '<button class="tile' + (sel ? " sel" : "") + '" type="button" data-id="' + esc(it.id) + '"' +
+      (ui.selecting ? ' aria-pressed="' + sel + '"' : "") + ">" +
+      '<div style="position:relative">' + photoBox(it, "No photo yet") + tag +
+      (ui.selecting ? '<span class="check">' + (sel ? "✓" : "") + "</span>" : "") + "</div>" +
+      '<span class="name">' + esc(it.itemDescription || "Untitled item") + "</span>" +
+      (sub.length ? '<span class="sub">' + sub.join('<span aria-hidden="true">·</span>') + "</span>" : "") +
+      "</button>";
+  }
+
+  function renderGrid(base) {
+    var rows = sortItems(filtered(base));
+    var main = $("main");
+    if (!rows.length) {
+      var msg = base.length ? "No items match these filters." :
+        (ui.tab === "listed" ? "Nothing is listed for sale. Open an item and choose Mark listed for sale." : "Your closet is empty. Add your first item.");
+      main.innerHTML = '<div class="empty">' + esc(msg) + "</div>";
+      return;
+    }
+    if (ui.sort !== "name" || ui.cat !== "All") {
+      main.innerHTML = '<div class="grid">' + rows.map(tileHtml).join("") + "</div>";
+      return;
+    }
+    var groups = {};
+    rows.forEach(function (it) { var c = normCat(it.category); (groups[c] = groups[c] || []).push(it); });
+    var order = CATEGORY_ORDER.concat(Object.keys(groups).filter(function (c) { return CATEGORY_ORDER.indexOf(c) === -1; }));
+    main.innerHTML = order.map(function (cat) {
+      var g = groups[cat];
+      if (!g) return "";
+      return '<section class="group"><div class="group-head"><span class="swatch" style="background:' + catColor(cat) + '"></span>' +
+        "<h2>" + esc(cat) + '</h2><span class="n">' + g.length + (g.length === 1 ? " item" : " items") + "</span></div>" +
+        '<div class="grid">' + g.map(tileHtml).join("") + "</div></section>";
+    }).join("");
+  }
+
+  function renderReview() {
+    var main = $("main");
+    var intro = '<p class="intro">Claude checks your Gmail every Sunday. New purchases and sold listings wait here until you keep or discard them. Nothing changes in your closet until you choose.</p>';
+    if (!ui.pending.length) {
+      main.innerHTML = intro + '<div class="empty">Nothing to review right now.</div>';
+      return;
+    }
+    var rows = ui.pending.slice().sort(function (a, b) { return String(b.foundAt || "").localeCompare(String(a.foundAt || "")); });
+    main.innerHTML = intro + '<div class="rows">' + rows.map(function (p) {
+      var d = p.data || {};
+      var src = [p.source, p.emailSubject ? "“" + p.emailSubject + "”" : "", p.foundAt ? fmtDate(p.foundAt) : ""].filter(Boolean).join(" · ");
+      if (p.kind === "sold") {
+        var target = byId(p.targetId);
+        var g = p.gone || {};
+        var saleBits = [g.reason || "Sold", g.salePrice != null && g.salePrice !== "" ? formatPrice(g.salePrice) : "", g.where || "", g.date ? fmtDate(g.date) : ""].filter(Boolean).join(" · ");
+        return '<div class="row">' +
+          '<div class="thumb">' + (target && !isBlank(target.imageUrl) ? '<img src="' + esc(target.imageUrl) + '" alt="">' : "") + "</div>" +
+          '<div class="body"><span><span class="pill sold">Sold</span></span>' +
+          '<span class="title">' + esc(target ? target.itemDescription : (p.summary || "An item you listed")) + "</span>" +
+          '<span class="line">' + esc(saleBits) + "</span>" +
+          (target ? "" : '<span class="line">Claude couldn\'t match this to an item in your closet. Mark it as gone from the item itself, then discard this.</span>') +
+          (src ? '<span class="line">' + esc(src) + "</span>" : "") +
+          '<div class="acts">' +
+          (target ? '<button class="btn primary small" type="button" data-keep="' + esc(p.id) + '">Mark as gone</button>' : "") +
+          '<button class="btn small" type="button" data-discard="' + esc(p.id) + '">Discard</button></div></div></div>';
+      }
+      var bits = [val(d.brand), val(d.colors), val(d.size) ? "Size " + val(d.size) : "", formatPrice(d.approxPrice)].filter(Boolean).join(" · ");
+      return '<div class="row">' +
+        '<div class="thumb">' + (!isBlank(d.imageUrl) ? '<img src="' + esc(d.imageUrl) + '" alt="">' : "") + "</div>" +
+        '<div class="body"><span><span class="pill newp">New purchase</span></span>' +
+        '<span class="title">' + esc(d.itemDescription || "Untitled item") + "</span>" +
+        (bits ? '<span class="line">' + esc(bits) + "</span>" : "") +
+        (val(d.notes) ? '<span class="line">' + esc(val(d.notes)) + "</span>" : "") +
+        (src ? '<span class="line">' + esc(src) + "</span>" : "") +
+        '<div class="acts"><button class="btn primary small" type="button" data-keep="' + esc(p.id) + '">Add to closet</button>' +
+        '<button class="btn small" type="button" data-discard="' + esc(p.id) + '">Discard</button></div></div></div>';
+    }).join("") + "</div>";
+  }
+
+  function renderGone(gone) {
+    var q = ui.search.trim().toLowerCase();
+    var rows = gone.filter(function (it) {
+      if (!q) return true;
+      var g = it.gone || {};
+      return [it.itemDescription, it.brand, it.colors, g.reason, g.where].map(function (v) { return String(v || "").toLowerCase(); }).join(" ").indexOf(q) !== -1;
+    }).sort(function (a, b) { return String(b.goneAt || "").localeCompare(String(a.goneAt || "")); });
+    var earned = 0, sold = 0, donated = 0;
+    gone.forEach(function (it) {
+      var g = it.gone || {};
+      if (g.reason === "Sold") { sold++; var n = priceNum(g.salePrice); if (n != null) earned += n; }
+      if (g.reason === "Donated") donated++;
+    });
+    var html = '<div class="stats">' +
+      '<div class="stat"><div class="v">' + money(earned) + '</div><div class="l">Resale earnings</div></div>' +
+      '<div class="stat"><div class="v">' + sold + '</div><div class="l">Sold</div></div>' +
+      '<div class="stat"><div class="v">' + donated + '</div><div class="l">Donated</div></div>' +
+      '<div class="stat"><div class="v">' + gone.length + '</div><div class="l">Gone in total</div></div></div>' +
+      '<p class="intro">Items here stay for one year after they leave, then Claude deletes them for good during the Sunday check. Open one to restore it to your closet.</p>';
+    if (!rows.length) {
+      $("main").innerHTML = html + '<div class="empty">' + (gone.length ? "No gone items match your search." : "Nothing has left your closet yet.") + "</div>";
+      return;
+    }
+    html += '<div class="rows">' + rows.map(function (it) {
+      var g = it.gone || {};
+      var bits = [g.salePrice != null && g.salePrice !== "" ? formatPrice(g.salePrice) : "", g.where || "", g.date ? fmtDate(g.date) : ""].filter(Boolean).join(" · ");
+      var purge = it.goneAt ? fmtDate(Date.parse(it.goneAt) + PURGE_DAYS * 864e5) : "";
+      return '<div class="row clickable" data-id="' + esc(it.id) + '" role="button" tabindex="0">' +
+        '<div class="thumb">' + (!isBlank(it.imageUrl) ? '<img src="' + esc(it.imageUrl) + '" alt="" loading="lazy">' : "") + "</div>" +
+        '<div class="body"><span><span class="pill' + (g.reason === "Sold" ? " sold" : "") + '">' + esc(g.reason || "Gone") + "</span></span>" +
+        '<span class="title">' + esc(it.itemDescription) + "</span>" +
+        (bits ? '<span class="line">' + esc(bits) + "</span>" : "") +
+        (purge ? '<span class="line">Deleted for good on ' + esc(purge) + "</span>" : "") +
+        "</div></div>";
+    }).join("") + "</div>";
+    $("main").innerHTML = html;
+  }
+
+  /* ---------- selection ---------- */
+  function selIds() { return Object.keys(ui.selected).filter(function (k) { return ui.selected[k]; }); }
+  function endSelect() {
+    ui.selecting = false;
+    ui.selected = {};
+    $("selectBtn").setAttribute("aria-pressed", "false");
+    $("selectBtn").textContent = "Select";
+  }
+  function renderSelbar() {
+    var n = selIds().length;
+    $("selbar").hidden = !ui.selecting;
+    $("selCount").textContent = n + " selected";
+    $("selListed").disabled = !n;
+    $("selGone").disabled = !n;
+  }
+
+  /* ---------- detail ---------- */
+  function openDetail(id) {
+    ui.detailId = id;
+    ui.detailMode = "view";
+    renderDetail();
+    if (!$("detailDlg").open) $("detailDlg").showModal();
+  }
+
+  function renderDetail(extra) {
+    var it = byId(ui.detailId);
+    var dlg = $("detailDlg");
+    if (!it) { if (dlg.open) dlg.close(); return; }
+    var st = statusOf(it);
+    var facts = [
+      ["Brand", val(it.brand)], ["Type", val(it.item)], ["Category", normCat(it.category)],
+      ["Colors", val(it.colors)], ["Size", val(it.size)], ["Occasion", occasionOk(it.attire) ? val(it.attire) : ""],
+      ["Price", formatPrice(it.approxPrice) || val(it.approxPrice)], ["Added", it.addedAt ? fmtDate(it.addedAt) : ""]
+    ].filter(function (f) { return f[1]; });
+    var notes = [val(it.notes), val(it.notes2)].filter(Boolean);
+    var statusBox = "";
+    if (st === "listed") {
+      var ls = it.listing || {};
+      statusBox = '<div class="note-box"><span class="pill sold">Listed for sale</span> ' +
+        esc([ls.where, ls.askingPrice ? "asking " + formatPrice(ls.askingPrice) : "", it.listedAt ? "since " + fmtDate(it.listedAt) : ""].filter(Boolean).join(" · ")) + "</div>";
+    }
+    if (st === "gone") {
+      var g = it.gone || {};
+      statusBox = '<div class="note-box"><span class="pill' + (g.reason === "Sold" ? " sold" : "") + '">' + esc(g.reason || "Gone") + "</span> " +
+        esc([g.salePrice != null && g.salePrice !== "" ? formatPrice(g.salePrice) : "", g.where, g.date ? fmtDate(g.date) : ""].filter(Boolean).join(" · ")) +
+        (it.goneAt ? "<br>Deleted for good on " + esc(fmtDate(Date.parse(it.goneAt) + PURGE_DAYS * 864e5)) + "." : "") + "</div>";
+    }
+
+    var acts = "";
+    if (db) {
+      if (st === "gone") {
+        acts = '<button class="btn primary" type="button" data-act="restore">Restore to closet</button>' +
+          '<span class="spacer"></span><button class="btn danger" type="button" data-act="delete">' + (extra === "confirmDelete" ? "Tap again to delete for good" : "Delete for good") + "</button>";
+      } else {
+        acts = '<button class="btn" type="button" data-act="edit">Edit</button>' +
+          (st === "listed" ? '<button class="btn" type="button" data-act="unlist">Take off sale</button>' : '<button class="btn" type="button" data-act="list">Mark listed for sale</button>') +
+          '<button class="btn primary" type="button" data-act="gone">Mark as gone</button>' +
+          '<span class="spacer"></span><button class="btn danger" type="button" data-act="delete">' + (extra === "confirmDelete" ? "Tap again to delete for good" : "Delete") + "</button>";
+      }
+    }
+
+    var listForm = extra === "listForm" ?
+      '<form class="inline-form" id="listForm"><div class="fields">' +
+      '<div class="field"><label for="lWhere">Where it\'s listed</label><input id="lWhere" placeholder="Poshmark, TheRealReal…" value="' + esc((it.listing || {}).where || "") + '"></div>' +
+      '<div class="field"><label for="lPrice">Asking price</label><input id="lPrice" inputmode="decimal" placeholder="$" value="' + esc((it.listing || {}).askingPrice || "") + '"></div>' +
+      '</div><div class="toolbar"><button class="btn primary" type="submit">Mark listed</button><button class="btn ghost" type="button" data-act="cancelList">Cancel</button></div></form>' : "";
+
+    dlg.innerHTML = '<div class="dlg">' +
+      '<div class="dlg-head"><h2>' + esc(it.itemDescription || "Untitled item") + '</h2><button class="btn ghost x" type="button" data-act="close" aria-label="Close">×</button></div>' +
+      '<div class="detail-top"><div class="photo-col">' + photoBox(it, "") +
+      (assets && st !== "gone" ? '<button class="btn small" type="button" data-act="photo">' + (isBlank(it.imageUrl) ? "Add photo" : "Replace photo") + "</button>" : "") +
+      '<span class="msg" id="photoMsg"></span></div>' +
+      '<div style="display:flex;flex-direction:column;gap:12px;min-width:0">' + statusBox +
+      '<dl class="facts">' + facts.map(function (f) { return "<dt>" + f[0] + "</dt><dd>" + esc(f[1]) + "</dd>"; }).join("") + "</dl>" +
+      (notes.length ? '<div class="note-box">' + notes.map(esc).join("<br>") + "</div>" : "") +
+      (!isBlank(it.links) ? '<a href="' + esc(it.links) + '" target="_blank" rel="noopener">View product page ↗</a>' : "") +
+      "</div></div>" + listForm +
+      (acts ? '<div class="actions">' + acts + "</div>" : "") + "</div>";
+  }
+
+  var pendingDeleteConfirm = null;
+
+  function detailAction(act) {
+    var it = byId(ui.detailId);
+    if (!it) return;
+    if (act === "close") { $("detailDlg").close(); return; }
+    if (act === "edit") { openEditor(it); return; }
+    if (act === "photo") { pickPhotoFor(it.id); return; }
+    if (act === "list") { renderDetail("listForm"); var w = $("lWhere"); if (w) w.focus(); return; }
+    if (act === "cancelList") { renderDetail(); return; }
+    if (act === "unlist") {
+      var body = stripMeta(it);
+      body.status = "active";
+      delete body.listing;
+      delete body.listedAt;
+      db.collection("items").doc(it.id).set(body).then(function () { toast("Taken off sale."); }, function (e) { toast(dbError(e)); });
+      return;
+    }
+    if (act === "gone") { openGone([it.id]); return; }
+    if (act === "restore") {
+      var rb = stripMeta(it);
+      rb.status = "active";
+      delete rb.gone;
+      delete rb.goneAt;
+      db.collection("items").doc(it.id).set(rb).then(function () { toast("Restored to your closet."); }, function (e) { toast(dbError(e)); });
+      return;
+    }
+    if (act === "delete") {
+      if (pendingDeleteConfirm !== it.id) {
+        pendingDeleteConfirm = it.id;
+        renderDetail("confirmDelete");
+        setTimeout(function () { if (pendingDeleteConfirm === it.id) { pendingDeleteConfirm = null; if ($("detailDlg").open) renderDetail(); } }, 4000);
+        return;
+      }
+      pendingDeleteConfirm = null;
+      deleteForGood(it).then(function () { $("detailDlg").close(); toast("Deleted for good."); }, function (e) { toast(dbError(e)); });
+    }
+  }
+
+  function deleteForGood(it) {
+    return db.collection("items").doc(it.id).delete().then(function () {
+      var id = blobId(it.imageUrl);
+      if (id && assets) return assets.delete(id).catch(function () {});
+    });
+  }
+
+  /* ---------- photos ---------- */
+  var photoTarget = null;
+  function pickPhotoFor(id) {
+    photoTarget = id;
+    $("photoPick").value = "";
+    $("photoPick").click();
+  }
+
+  $("photoPick").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var id = photoTarget;
+    photoTarget = null;
+    if (!file || !id) return;
+    var it = byId(id);
+    if (!it) return;
+    var msg = $("photoMsg");
+    if (msg) { msg.className = "msg"; msg.textContent = "Uploading…"; }
+    var oldId = blobId(it.imageUrl);
+    uploadPhoto(file).then(function (res) {
+      return db.collection("items").doc(id).update({ imageUrl: "/_blob/" + res.id }).then(function () {
+        if (oldId && assets) assets.delete(oldId).catch(function () {});
+        toast("Photo saved.");
+      }, function (e) { assets.delete(res.id).catch(function () {}); throw { db: e }; });
+    }).catch(function (e) {
+      var text = e && e.db ? dbError(e.db) : assetError(e);
+      var m = $("photoMsg");
+      if (m) { m.className = "msg err"; m.textContent = text; } else toast(text);
+    });
+  });
+
+  /* ---------- add / edit ---------- */
+  var editor = { id: null, file: null, previewUrl: null };
+
+  function fieldHtml(id, label, value, opts) {
+    opts = opts || {};
+    var cls = "field" + (opts.wide ? " wide" : "");
+    if (opts.select) {
+      return '<div class="' + cls + '"><label for="' + id + '">' + label + '</label><select id="' + id + '">' +
+        opts.select.map(function (o) { return '<option' + (o === value ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select></div>";
+    }
+    if (opts.area) {
+      return '<div class="' + cls + '"><label for="' + id + '">' + label + '</label><textarea id="' + id + '" rows="2">' + esc(value) + "</textarea></div>";
+    }
+    return '<div class="' + cls + '"><label for="' + id + '">' + label + '</label><input id="' + id + '" value="' + esc(value) + '"' +
+      (opts.list ? ' list="' + opts.list + '"' : "") + (opts.required ? " required" : "") + (opts.placeholder ? ' placeholder="' + esc(opts.placeholder) + '"' : "") + "></div>";
+  }
+
+  function openEditor(it) {
+    editor = { id: it ? it.id : null, file: null, previewUrl: null };
+    var d = it || { category: "Clothing" };
+    var occ = {};
+    (ui.items || []).forEach(function (x) { if (occasionOk(x.attire)) occ[val(x.attire)] = true; });
+    ["Casual", "Comfort", "Business", "Cold Weather", "Formal", "Sportswear"].forEach(function (o) { occ[o] = true; });
+    var cats = CATEGORY_ORDER.slice();
+    if (d.category && cats.indexOf(d.category) === -1) cats.push(d.category);
+    var photo = it ? "" :
+      '<div class="photo-drop wide"><div class="ph" id="edPhoto"><div class="ph-empty"><span class="hint">No photo</span></div></div>' +
+      '<div class="ctl"><button class="btn small" type="button" id="edPick">Choose photo</button>' +
+      '<button class="btn small" type="button" id="edFill" hidden>Fill in details from photo</button>' +
+      '<span class="help" id="edFillMsg">Optional. A photo of the item or its product page.</span></div></div>';
+    $("editDlg").innerHTML = '<form class="dlg" id="edForm">' +
+      '<div class="dlg-head"><h2>' + (it ? "Edit item" : "Add an item") + '</h2><button class="btn ghost x" type="button" id="edClose" aria-label="Close">×</button></div>' +
+      photo +
+      '<div class="fields">' +
+      fieldHtml("edDesc", "Name", val(d.itemDescription), { wide: true, required: true, placeholder: "e.g. Veronica Beard Plaid Blazer" }) +
+      fieldHtml("edBrand", "Brand", val(d.brand)) +
+      fieldHtml("edCat", "Category", d.category || "Clothing", { select: cats }) +
+      fieldHtml("edType", "Type", val(d.item), { placeholder: "Sneakers, Blazer, Tote…" }) +
+      fieldHtml("edColors", "Colors", val(d.colors)) +
+      fieldHtml("edSize", "Size", val(d.size)) +
+      fieldHtml("edOcc", "Occasion", occasionOk(d.attire) ? val(d.attire) : "", { list: "occList" }) +
+      fieldHtml("edPrice", "Price paid", val(d.approxPrice), { placeholder: "$" }) +
+      fieldHtml("edLink", "Product link", val(d.links), { placeholder: "https://…" }) +
+      fieldHtml("edNotes", "Notes", val(d.notes), { wide: true, area: true, placeholder: "Where and when you got it" }) +
+      (val(d.notes2) ? fieldHtml("edNotes2", "More notes", val(d.notes2), { wide: true, area: true }) : "") +
+      "</div>" +
+      '<datalist id="occList">' + Object.keys(occ).sort().map(function (o) { return '<option value="' + esc(o) + '">'; }).join("") + "</datalist>" +
+      '<span class="msg" id="edMsg"></span>' +
+      '<div class="actions"><button class="btn primary" type="submit" id="edSave">' + (it ? "Save changes" : "Add to closet") + '</button>' +
+      '<button class="btn ghost" type="button" id="edCancel">Cancel</button></div></form>';
+    if ($("detailDlg").open) $("detailDlg").close();
+    $("editDlg").showModal();
+    if (!it) {
+      $("edPick").addEventListener("click", function () { $("edFile").click(); });
+    }
+    $("edDesc").focus();
+  }
+
+  var edFile = document.createElement("input");
+  edFile.type = "file";
+  edFile.accept = "image/*";
+  edFile.id = "edFile";
+  edFile.hidden = true;
+  document.body.appendChild(edFile);
+  edFile.addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    this.value = "";
+    if (!f) return;
+    editor.file = f;
+    if (editor.previewUrl) URL.revokeObjectURL(editor.previewUrl);
+    editor.previewUrl = URL.createObjectURL(f);
+    var box = $("edPhoto");
+    if (box) box.innerHTML = '<img src="' + editor.previewUrl + '" alt="Chosen photo">';
+    var fill = $("edFill");
+    if (fill) fill.hidden = !(sample && canSendImages);
+    var m = $("edFillMsg");
+    if (m) m.textContent = sample && canSendImages ? "Claude can read the photo and suggest the details." : "The photo will be saved with the item.";
+  });
+
+  function fillFromPhoto() {
+    if (!editor.file || !sample) return;
+    var m = $("edFillMsg"), btn = $("edFill");
+    btn.disabled = true;
+    m.className = "help";
+    m.textContent = "Claude is looking at the photo…";
+    shrink(editor.file).then(function (b) {
+      return sample.json(
+        "The image shows one clothing, shoe, accessory, handbag, or intimates item from someone's closet (a product photo or their own photo). " +
+        "Identify it and reply with only a JSON object with these string fields: " +
+        '"itemDescription" (a short product-style name, brand first when known, e.g. "Veronica Beard Plaid Blazer"), ' +
+        '"brand" (empty string if you can\'t tell), "category" (exactly one of Clothing, Shoes, Accessories, Handbags, Intimates), ' +
+        '"item" (the type, e.g. Sneakers, Blazer, Tote, Sports Bra), "colors" (plain color words), ' +
+        '"attire" (one of Casual, Comfort, Business, Cold Weather, Formal, Sportswear, or empty). Don\'t guess a brand you can\'t see.',
+        { images: b, modelTier: "default" }
+      );
+    }).then(function (r) {
+      if (!r || typeof r !== "object") throw { code: "invalid_json" };
+      function put(id, v) { var el = $(id); if (el && typeof v === "string" && v.trim() && !el.value.trim()) el.value = v.trim(); }
+      put("edDesc", r.itemDescription); put("edBrand", r.brand); put("edType", r.item);
+      put("edColors", r.colors); put("edOcc", r.attire);
+      if (CATEGORY_ORDER.indexOf(r.category) !== -1) $("edCat").value = r.category;
+      m.textContent = "Filled in the empty fields. Check them before you save.";
+    }).catch(function (e) {
+      var code = e && e.code;
+      m.className = "help msg err";
+      m.textContent = code === "not_granted" ? "Claude wasn't given permission to read photos on this page." :
+        code === "rate_limited" ? "Too many requests. Wait a minute and try again." :
+        "Claude couldn't read that photo. Fill in the details yourself.";
+    }).then(function () { btn.disabled = false; });
+  }
+
+  function saveEditor(ev) {
+    ev.preventDefault();
+    var body = {
+      itemDescription: $("edDesc").value.trim(),
+      brand: $("edBrand").value.trim(),
+      category: $("edCat").value,
+      item: $("edType").value.trim(),
+      colors: $("edColors").value.trim(),
+      size: $("edSize").value.trim(),
+      attire: $("edOcc").value.trim(),
+      approxPrice: $("edPrice").value.trim(),
+      links: $("edLink").value.trim(),
+      notes: $("edNotes").value.trim()
+    };
+    if ($("edNotes2")) body.notes2 = $("edNotes2").value.trim();
+    if (!body.itemDescription) { $("edMsg").className = "msg err"; $("edMsg").textContent = "Give the item a name."; return; }
+    var save = $("edSave");
+    save.disabled = true;
+    $("edMsg").className = "msg";
+    $("edMsg").textContent = "Saving…";
+    var p;
+    if (editor.id) {
+      var id = editor.id;
+      p = db.collection("items").doc(id).update(body).then(function () { return id; });
+    } else {
+      var newId = nextItemId();
+      body.notes2 = body.notes2 || "";
+      body.addedAt = new Date().toISOString();
+      body.addedVia = "page";
+      body.status = "active";
+      var up = editor.file && assets ? uploadPhoto(editor.file).then(function (r) { body.imageUrl = "/_blob/" + r.id; }, function (e) { throw { asset: e }; }) : Promise.resolve();
+      p = up.then(function () { return db.collection("items").doc(newId).set(body); }).then(function () { return newId; });
+    }
+    p.then(function (id) {
+      $("editDlg").close();
+      toast(editor.id ? "Changes saved." : "Added to your closet.");
+      openDetail(id);
+    }, function (e) {
+      save.disabled = false;
+      $("edMsg").className = "msg err";
+      $("edMsg").textContent = e && e.asset ? assetError(e.asset) : dbError(e);
+    });
+  }
+
+  $("editDlg").addEventListener("click", function (e) {
+    var t = e.target;
+    if (t === this || t.id === "edClose" || t.id === "edCancel") { this.close(); return; }
+    if (t.id === "edFill") fillFromPhoto();
+  });
+  $("editDlg").addEventListener("submit", saveEditor);
+  $("editDlg").addEventListener("close", function () {
+    if (editor.previewUrl) { URL.revokeObjectURL(editor.previewUrl); editor.previewUrl = null; }
+  });
+
+  /* ---------- mark as gone ---------- */
+  var goneIds = [];
+  function openGone(ids, preset) {
+    goneIds = ids.slice();
+    preset = preset || {};
+    var one = ids.length === 1 ? byId(ids[0]) : null;
+    $("goneDlg").innerHTML = '<form class="dlg" id="goneForm">' +
+      '<div class="dlg-head"><h2>' + (one ? "Mark “" + esc(one.itemDescription) + "” as gone" : "Mark " + ids.length + " items as gone") + '</h2>' +
+      '<button class="btn ghost x" type="button" data-g="close" aria-label="Close">×</button></div>' +
+      '<p class="intro" style="margin:0">It moves to the Gone tab. You can restore it any time in the next year; after that it\'s deleted for good.</p>' +
+      '<div class="fields">' +
+      '<div class="field"><label for="gReason">What happened</label><select id="gReason">' +
+      GONE_REASONS.map(function (r) { return "<option" + (r === (preset.reason || "Sold") ? " selected" : "") + ">" + r + "</option>"; }).join("") + "</select></div>" +
+      '<div class="field"><label for="gDate">Date</label><input id="gDate" type="date" value="' + esc(preset.date || todayISO()) + '"></div>' +
+      '<div class="field" id="gPriceWrap"><label for="gPrice">' + (ids.length > 1 ? "Sale price (total)" : "Sale price") + '</label><input id="gPrice" inputmode="decimal" placeholder="$" value="' + esc(preset.salePrice || "") + '"></div>' +
+      '<div class="field"><label for="gWhere">Where or to whom</label><input id="gWhere" placeholder="Poshmark, Goodwill, a friend…" value="' + esc(preset.where || ((one && one.listing && one.listing.where) || "")) + '"></div>' +
+      "</div>" +
+      '<span class="msg" id="gMsg"></span>' +
+      '<div class="actions"><button class="btn primary" type="submit">Mark as gone</button><button class="btn ghost" type="button" data-g="close">Cancel</button></div></form>';
+    if ($("detailDlg").open) $("detailDlg").close();
+    $("goneDlg").showModal();
+    syncGonePrice();
+  }
+  function syncGonePrice() {
+    var w = $("gPriceWrap");
+    if (w) w.hidden = $("gReason").value !== "Sold";
+  }
+  $("goneDlg").addEventListener("change", function (e) { if (e.target.id === "gReason") syncGonePrice(); });
+  $("goneDlg").addEventListener("click", function (e) {
+    if (e.target === this || (e.target.dataset && e.target.dataset.g === "close")) this.close();
+  });
+  $("goneDlg").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var reason = $("gReason").value;
+    var g = { reason: reason, date: $("gDate").value || todayISO(), where: $("gWhere").value.trim() };
+    var priceRaw = $("gPrice").value.trim();
+    var total = reason === "Sold" ? priceNum(priceRaw) : null;
+    var ids = goneIds.slice();
+    var now = new Date().toISOString();
+    $("gMsg").className = "msg";
+    $("gMsg").textContent = "Saving…";
+    var chain = Promise.resolve();
+    ids.forEach(function (id, i) {
+      chain = chain.then(function () {
+        var it = byId(id);
+        if (!it) return;
+        var gi = Object.assign({}, g);
+        if (total != null) gi.salePrice = ids.length > 1 ? Math.round((total / ids.length) * 100) / 100 : total;
+        return db.collection("items").doc(id).update({ status: "gone", goneAt: now, gone: gi });
+      });
+    });
+    chain.then(function () {
+      $("goneDlg").close();
+      if (ui.selecting) { endSelect(); render(); }
+      toast(ids.length === 1 ? "Moved to Gone." : ids.length + " items moved to Gone.");
+    }, function (err) {
+      $("gMsg").className = "msg err";
+      $("gMsg").textContent = dbError(err);
+    });
+  });
+
+  /* ---------- review queue ---------- */
+  function keepPending(pid) {
+    var p = ui.pending.filter(function (x) { return x.id === pid; })[0];
+    if (!p) return;
+    if (p.kind === "sold") {
+      var target = byId(p.targetId);
+      if (!target) return;
+      var g = Object.assign({ reason: "Sold", date: todayISO() }, p.gone || {});
+      db.collection("items").doc(target.id).update({ status: "gone", goneAt: new Date().toISOString(), gone: g })
+        .then(function () { return db.collection("pending").doc(pid).delete(); })
+        .then(function () { toast("Moved to Gone."); }, function (e) { toast(dbError(e)); });
+      return;
+    }
+    var d = Object.assign({
+      itemDescription: "", category: "", item: "", colors: "", size: "", brand: "", attire: "",
+      approxPrice: "", links: "", notes: "", notes2: ""
+    }, p.data || {});
+    d.addedAt = new Date().toISOString();
+    d.addedVia = d.addedVia || "weekly-task";
+    d.status = "active";
+    var newId = nextItemId();
+    db.collection("items").doc(newId).set(d)
+      .then(function () { return db.collection("pending").doc(pid).delete(); })
+      .then(function () { toast("Added to your closet."); }, function (e) { toast(dbError(e)); });
+  }
+
+  function discardPending(pid) {
+    db.collection("pending").doc(pid).delete().then(function () { toast("Discarded."); }, function (e) { toast(dbError(e)); });
+  }
+
+  /* ---------- events ---------- */
+  $("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-tab]");
+    if (!b) return;
+    ui.tab = b.dataset.tab;
+    ui.cat = "All";
+    render();
+    window.scrollTo(0, 0);
+  });
+
+  $("chips").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-cat]");
+    if (!b) return;
+    ui.cat = b.dataset.cat;
+    render();
+  });
+
+  $("filters").addEventListener("change", function (e) {
+    var id = e.target.id;
+    if (id === "fBrand") ui.brand = e.target.value;
+    if (id === "fOcc") ui.occasion = e.target.value;
+    if (id === "fColor") ui.color = e.target.value;
+    if (id === "fSort") {
+      ui.sort = e.target.value;
+      try { localStorage.setItem("wl-view", JSON.stringify({ sort: ui.sort })); } catch (err) {}
+    }
+    render();
+  });
+
+  $("filters").addEventListener("click", function (e) {
+    if (e.target.id === "fClear") { ui.brand = ""; ui.occasion = ""; ui.color = ""; render(); }
+  });
+
+  $("search").addEventListener("input", function (e) { ui.search = e.target.value; render(); });
+
+  $("main").addEventListener("click", function (e) {
+    var k = e.target.closest("[data-keep]");
+    if (k) { k.disabled = true; keepPending(k.dataset.keep); return; }
+    var d = e.target.closest("[data-discard]");
+    if (d) { d.disabled = true; discardPending(d.dataset.discard); return; }
+    var t = e.target.closest("[data-id]");
+    if (!t) return;
+    if (ui.selecting && t.classList.contains("tile")) {
+      ui.selected[t.dataset.id] = !ui.selected[t.dataset.id];
+      render();
+      return;
+    }
+    openDetail(t.dataset.id);
+  });
+
+  $("main").addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var r = e.target.closest(".row.clickable");
+    if (r) { e.preventDefault(); openDetail(r.dataset.id); }
+  });
+
+  $("addBtn").addEventListener("click", function () { openEditor(null); });
+
+  $("selectBtn").addEventListener("click", function () {
+    if (ui.selecting) endSelect();
+    else { ui.selecting = true; this.setAttribute("aria-pressed", "true"); this.textContent = "Done selecting"; }
+    render();
+  });
+
+  $("selCancel").addEventListener("click", function () { endSelect(); render(); });
+  $("selGone").addEventListener("click", function () { var ids = selIds(); if (ids.length) openGone(ids); });
+  $("selListed").addEventListener("click", function () {
+    var ids = selIds();
+    if (!ids.length) return;
+    var now = new Date().toISOString();
+    var chain = Promise.resolve();
+    ids.forEach(function (id) {
+      chain = chain.then(function () {
+        var it = byId(id);
+        if (!it || statusOf(it) === "listed") return;
+        return db.collection("items").doc(id).update({ status: "listed", listedAt: now });
+      });
+    });
+    chain.then(function () { endSelect(); render(); toast(ids.length === 1 ? "Marked listed for sale." : ids.length + " items marked listed for sale."); },
+      function (e) { toast(dbError(e)); });
+  });
+
+  $("detailDlg").addEventListener("click", function (e) {
+    if (e.target === this) { this.close(); return; }
+    var b = e.target.closest("[data-act]");
+    if (b) detailAction(b.dataset.act);
+  });
+
+  $("detailDlg").addEventListener("submit", function (e) {
+    if (e.target.id !== "listForm") return;
+    e.preventDefault();
+    var it = byId(ui.detailId);
+    if (!it) return;
+    var listing = { where: $("lWhere").value.trim(), askingPrice: $("lPrice").value.trim() };
+    db.collection("items").doc(it.id).update({ status: "listed", listedAt: new Date().toISOString(), listing: listing })
+      .then(function () { toast("Marked listed for sale."); }, function (err) { toast(dbError(err)); });
+  });
+
+  $("detailDlg").addEventListener("close", function () { ui.detailId = null; pendingDeleteConfirm = null; });
+
+  /* ---------- start ---------- */
+  async function init() {
+    var c = window.claude;
+    db = c && c.use ? await c.use("db") : null;
+    if (!db) {
+      $("main").innerHTML = '<div class="empty">This page can\'t reach your closet data right now. Reopen it to try again.</div>';
+      $("metaLine").textContent = "";
+      return;
+    }
+    db.collection("items").onSnapshot(function (snap) {
+      ui.items = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+      render();
+    }, function (err) {
+      $("main").innerHTML = '<div class="empty">Couldn\'t load your closet (' + esc(err.code) + "). Reopen the page to try again.</div>";
+    });
+    db.collection("pending").onSnapshot(function (snap) {
+      ui.pending = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+      render();
+    }, function () {});
+    c.use("assets").then(function (a) { assets = a; render(); }, function () {});
+    c.use("sample").then(function (s) {
+      sample = s;
+      if (!s) return;
+      return s.limits().then(function (l) { canSendImages = !!(l && l.images); }, function () {});
+    }, function () {});
+  }
+
+  init();
+</script>
