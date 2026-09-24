@@ -2,8 +2,18 @@
 
 A personal closet inventory that runs entirely in the cloud as a Claude artifact. It works from any browser signed in to claude.ai, and nothing runs on a local machine.
 
-- **Live page:** https://claude.ai/artifact/7xQC1kFbFuVqE2jUba7kKY (private to its owner)
+- **My live copy:** https://claude.ai/artifact/7xQC1kFbFuVqE2jUba7kKY (private, so only I can open it)
 - **Source:** `index.html` (published to the artifact with the capabilities below)
+
+## Use it yourself
+
+The page runs as a Claude artifact, so there's no server to host and nothing to install. You need a Claude account, and for the weekly Gmail check you also need Claude Code with the Gmail connector.
+
+1. **Publish the page.** In Claude Code, give Claude `index.html` from this repo and ask it to publish the file as an artifact with these capabilities: `db`, `assets` and `sample` (see the JSON below). You'll get a private link that works from any browser where you're signed in to Claude.
+2. **Add your clothes.** Use **+ Add item** on the page, or give Claude a spreadsheet or list and ask it to write each item into the artifact's `items` collection, using the data model below.
+3. **Turn on the weekly Gmail check (optional).** Create a Claude Code routine that runs once a week with the Gmail connector attached. Use the prompt in [`routine-prompt.md`](routine-prompt.md) with your artifact link in place of `YOUR_ARTIFACT_URL`.
+
+Your data stays in your own artifact. Nobody else can see it unless you share the page.
 
 ## What it does
 
@@ -51,7 +61,7 @@ A personal closet inventory that runs entirely in the cloud as a Claude artifact
 
 ## Automation
 
-The **Weekly Wardrobe Inventory Update** routine runs every Sunday at 15:00 UTC in a fresh cloud session with the Gmail connector. It:
+The weekly routine ([`routine-prompt.md`](routine-prompt.md)) runs every Sunday in a fresh cloud session with the Gmail connector. It:
 
 1. Adds new purchase confirmations to `pending` as `kind: "new"`.
 2. Adds resale "item sold" emails to `pending` as `kind: "sold"`, matched to an item when the match is confident.
